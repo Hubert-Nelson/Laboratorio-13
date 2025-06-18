@@ -3,14 +3,16 @@ package com.example.animaciones
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -29,42 +31,46 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            VisibilityAnimationScreen()
+            ColorAnimationScreen()
         }
     }
 }
 
 @Composable
-fun VisibilityAnimationScreen() {
-    var isVisible by remember { mutableStateOf(true) }
+fun ColorAnimationScreen() {
+    var isBlue by remember { mutableStateOf(true) }
+
+    val targetColor by animateColorAsState(
+        targetValue = if (isBlue) Color.Blue else Color.Green,
+        animationSpec = spring(
+            dampingRatio = 0.5f,
+            stiffness = 100f
+        )
+    )
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Button(onClick = { isVisible = !isVisible }) {
-            Text(text = if (isVisible) "Ocultar" else "Mostrar")
+        Button(onClick = { isBlue = !isBlue }) {
+            Text("Cambiar Color")
         }
 
-        // El cuadro de color que mostrará u ocultará
-        AnimatedVisibility(
-            visible = isVisible,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(200.dp)
-                    .background(Color.Blue)
-            )
-        }
+        Spacer(modifier = Modifier.size(24.dp))
+
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .background(targetColor)
+        )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
-    VisibilityAnimationScreen()
+fun ColorAnimationScreenPreview() {
+    ColorAnimationScreen()
 }
